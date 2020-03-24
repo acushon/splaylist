@@ -3,6 +3,10 @@
 # •  To install spotipy on Ubuntu
 #     1.  sudo apt install python3-pip
 #     2.  pip3 install spotipy
+#     3.  create .spotify in the user's HOME directory using this format
+#         username
+#         client id
+#         client secret
 import pprint
 import sys
 from utility import Utility
