@@ -21,24 +21,37 @@ playlistPrefix='sz'
 
 #Operational variables
 cred=Utility.getCred()
-username = cred['userName']
+token = util.prompt_for_user_token(cred['userName'], scope)
+if token:
+    sp = spotipy.Spotify(auth=token)
+    sp.trace = False
+else:
+    print("Can't get token for", cred['userName'])
+    exit()
+
+#Main code
+def createPlaylist(playlist_name, silent=False):
+    if not silent:
+        print(divider)
+        print("Creating playlist: " + playlist_name)
+    try:
+        playlist=sp.user_playlist_create(cred['userName'], playlist_name,description="Twitch playlist " + playlist_name)
+        if not silent:
+            print("Playlist " + playlist_name + " created.")
+            print(divider)
+            pprint.pprint(playlist)
+        return playlist
+    except:
+        if not silent:
+            print("Unable to create " + playlist_name)
+            pprint.ppritn(playlist)
+
+
+#This clause allows a command line override of playlist name
 if len(sys.argv) > 1:
     playlist_name = sys.argv[1]
 else:
     playlist_name = playlistPrefix + Utility.getTimestamp()
 
-playlist_description = "Twitch playlist " + playlist_name
-
-
-token = util.prompt_for_user_token(username, scope)
-if token:
-    sp = spotipy.Spotify(auth=token)
-    sp.trace = False
-    playlist = sp.user_playlist_create(username, playlist_name,
-                                        description=playlist_description)
-    pprint.pprint(playlist)
-    print(divider)
-    print("Playlist \"" + playlist['name'] + "\" created")
-    print(divider)
-else:
-    print("Can't get token for", username)
+playlist=createPlaylist(playlist_name, True)
+pprint.pprint(playlist)
