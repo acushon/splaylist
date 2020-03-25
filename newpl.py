@@ -14,12 +14,15 @@ from utility import Utility
 import spotipy
 import spotipy.util as util
 
-#User variables
+# User variables
 divider='***********************************'
 scope = "playlist-modify-public"
-playlistPrefix='sz'
+playlistPrefix='zs'
+defaultSong="Redbone"
+searchDividers=['|',';',':',',']
+searchRemoves=[(' by '," "), ("'",""), ('"',"")]
 
-#Operational variables
+# Operational variables
 cred=Utility.getCred()
 token = util.prompt_for_user_token(cred['userName'], scope)
 if token:
@@ -29,29 +32,48 @@ else:
     print("Can't get token for", cred['userName'])
     exit()
 
-#Main code
+# Functions
 def createPlaylist(playlist_name, silent=False):
-    if not silent:
-        print(divider)
-        print("Creating playlist: " + playlist_name)
     try:
         playlist=sp.user_playlist_create(cred['userName'], playlist_name,description="Twitch playlist " + playlist_name)
-        if not silent:
-            print("Playlist " + playlist_name + " created.")
-            print(divider)
-            pprint.pprint(playlist)
         return playlist
     except:
-        if not silent:
-            print("Unable to create " + playlist_name)
-            pprint.ppritn(playlist)
+        print("Unable to create " + playlist_name)
+        exit()
 
+def songUri(findMe):
+    result=sp.search(findMe)
+    return result['tracks']['items'][0]['uri']
 
-#This clause allows a command line override of playlist name
+def addToPlaylist(playlist_id, track_id):
+    return sp.user_playlist_add_tracks(cred['userName'], playlist_id, track_id)
+
+# Main
+# This clause allows a command line override of playlist name
 if len(sys.argv) > 1:
     playlist_name = sys.argv[1]
 else:
     playlist_name = playlistPrefix + Utility.getTimestamp()
 
+# Create the new playlist and update user
 playlist=createPlaylist(playlist_name, True)
-pprint.pprint(playlist)
+print(playlist_name + ' playlist created')
+
+# Add default song to the playlist
+result=addToPlaylist(playlist['id'],[songUri(defaultSong)])
+
+# Take live input for new songs for playlist
+input_active=True
+while input_active:
+    searchTerm=input("Enter song to search for: ")
+    if searchTerm.lower()=='!quit':
+        input_active=False
+    else:
+        inputArray = Utility.processInput(searchDividers, searchRemoves, searchTerm)
+        searchArray=[]
+        for element in inputArray:
+            searchArray.append(songUri(element))
+        addToPlaylist(playlist['id'],searchArray)
+        print(searchArray)
+        print('Song added')
+

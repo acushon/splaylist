@@ -1,4 +1,5 @@
 import os
+import time
 from datetime import datetime
 
 class Utility:
@@ -20,3 +21,14 @@ class Utility:
 
     def getTimestamp(override=timeFormat):
         return datetime.now().strftime(override)
+
+    def processInput(dividers, removes, searchString):
+        for remove in removes:
+            searchString=searchString.replace(remove[0],remove[1])
+        for item in dividers:
+            if item in searchString:
+                return [x.strip() for x in searchString.split(item)]
+        return [searchString]
+            
+    def sleep(seconds):
+        time.sleep(seconds)
