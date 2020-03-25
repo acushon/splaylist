@@ -1,12 +1,3 @@
-# Creates a playlist for a user
-# •  To run this you need python3 and spotipy.  You may need to run sudo ln -sf /usr/bin/python3 /usr/bin/python to link to correct version
-# •  To install spotipy on Ubuntu
-#     1.  sudo apt install python3-pip
-#     2.  pip3 install spotipy
-#     3.  create .spotify in the user's HOME directory using this format
-#         username
-#         client id
-#         client secret
 import pprint
 import sys
 from utility import Utility
@@ -19,10 +10,11 @@ divider='***********************************'
 scope = "playlist-modify-public"
 playlistPrefix='zs'
 defaultSong="Redbone"
-searchDividers=['|',';',':',',']
-searchRemoves=[(' by '," "), ("'",""), ('"',"")]
 
 # Operational variables
+searchLength=255
+searchDividers=['|',';',':',',']
+searchRemoves=[(' by '," "), ("'",""), ('"',"")]
 cred=Utility.getCred()
 token = util.prompt_for_user_token(cred['userName'], scope)
 if token:
@@ -65,7 +57,7 @@ result=addToPlaylist(playlist['id'],[songUri(defaultSong)])
 # Take live input for new songs for playlist
 input_active=True
 while input_active:
-    searchTerm=input("Enter song to search for: ")
+    searchTerm=input("Enter song to search for: ")[:searchLength]
     if searchTerm.lower()=='!quit':
         input_active=False
     else:
