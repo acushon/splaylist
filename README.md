@@ -10,7 +10,7 @@ Download the source code or clone the git repository.
 * Spotipy
 * Spotify account
 * Access to https://developer.spotify.com
-* An app created at https://developer.spotify.com/dashboard/applications which will provide a Client ID and Client Secret
+* An app created at https://developer.spotify.com/dashboard/applications which will provide a Client ID and Client Secret.  You must include http://localhost/ as a Redirect URI or the app won't work.
 
 ### Installing
 #### Installing Spotipy
